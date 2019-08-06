@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+	
+	<!-- 开启注解扫描 -->
+	<context:component-scan base-package="cn.zj.ssd"/>
+	
+	<!-- 1.配置数据源 -->	
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+		init-method="init" 
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		
+		<property name="url" value="jdbc:mysql://localhost:3306/springdata"/>
+		
+		<property name="username" value="root"/>
+		<property name="password" value="root"/>
+		<property name="maxActive" value="10"/>
+	</bean>
+	<!-- 2.配置实体对象管理工厂对象 -->
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+		
+		<!-- 配置实体对象对应包 -->
+		<property name="packagesToScan" value="cn.zj.ssd.pojo"/>
+		
+		<!-- 配置jpa适配器 -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+		</property>
+			
+		<!-- 框架可选配置 -->
+		<property name="jpaProperties">
+			<props>
+				<!-- 配置数据库方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+                <!-- 定义sql语句是否显示 -->
+              	<prop key="hibernate.show_sql">true</prop>
+              	<!-- 定义sql语句格式化 -->
+                <prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- 3.配置jpa的集成 -->
+	<jpa:repositories base-package="cn.zj.ssd.dao" entity-manager-factory-ref="entityManagerFactory"/>
+	<!-- 4.配置事务管理器 -->	
+	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<!-- 5.开启事务注解驱动 -->	
+	<tx:annotation-driven transaction-manager="txManager"/>
+	
+</beans>
