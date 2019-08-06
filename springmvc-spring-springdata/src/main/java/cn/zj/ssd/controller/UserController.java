@@ -19,12 +19,7 @@ public class UserController {
 	
 	@RequestMapping("/login")
 	public String login(User user,Model m) {
-		System.out.println("user :"+user);
-		
-		System.out.println("userService :"+userService);
 		User loginUser = userService.login(user);
-		
-		System.out.println("loginUser :"+loginUser);
 		
 		if(loginUser != null) {
 			//使用重定向跳转到 list页面
